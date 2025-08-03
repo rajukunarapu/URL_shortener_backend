@@ -20,7 +20,7 @@ exports.signupController = async (req, res) => {
       .cookie("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-        sameSite: "none", // Adjust based on your requirements
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Adjust based on your requirements
         maxAge: 24 * 60 * 60 * 1000,
       })
       .json({
@@ -61,7 +61,7 @@ exports.loginController = async (req, res) => {
       .cookie("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-        sameSite: "none", // Adjust based on your requirements
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Adjust based on your requirements
         maxAge: 24 * 60 * 60 * 1000,
       })
       .json({
@@ -92,7 +92,7 @@ exports.logoutController = async (req, res) => {
         httpOnly: true,
         expires: new Date(Date.now()),
         secure: process.env.NODE_ENV === "production",
-        sameSite: "none",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       })
       .json({ message: "Logout successful", success: true });
   } catch (error) {

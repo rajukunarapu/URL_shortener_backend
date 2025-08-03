@@ -12,7 +12,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const allowedOrigins = [process.env.FRONTEND_URL || 'http://localhost:3000'];
+const allowedOrigins = [process.env.FRONTEND_URL, 'http://localhost:5000'];
 
 app.use(cors({
     origin:function (origin, callback) {
@@ -22,6 +22,7 @@ app.use(cors({
         }
         if(allowedOrigins.includes(origin)) {
             // Allow requests from the allowed origins
+            console.log({origin})
             return callback(null, true);
         } else {
             // Reject requests from disallowed origins

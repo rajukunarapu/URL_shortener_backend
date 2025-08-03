@@ -21,7 +21,7 @@ exports.shortenController = async (req, res) => {
 
     const data = { shortURL: urlData.shortURL, code: urlData.code };
 
-    res.json({ message: "URL shortened successfully", data: data, success: true });
+    res.json({ message: "URL shortened successfully", URLObject: data, success: true });
   } catch (err) {
     console.error("Error in shortenController:", err);
     res.status(500).json({
@@ -47,7 +47,16 @@ exports.redirectController = async (req, res) => {
     urlData.clicks += 1;
     await urlData.save();
 
-    // Redirect to original URL
+    // Check if the request expects JSON (Axios/fetch call)
+    if (req.headers.accept && req.headers.accept.includes("application/json")) {
+      return res.json({
+        success: true,
+        message: "Original URL fetched successfully",
+        URLObject: { originalURL: urlData.originalURL }
+      });
+    }
+
+    // Otherwise, a normal redirect (for browsers clicking the link)
     res.redirect(urlData.originalURL);
     console.log(`Redirected to: ${urlData.originalURL}`);
 
@@ -78,9 +87,25 @@ exports.statsController = async (req, res) => {
       createdBy: url.user.username
     };
 
-    res.json({ message: "URL stats retrieved successfully", success: true, data: data });
+    res.json({ message: "URL stats retrieved successfully", success: true, URLObject: data });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: err.message, success: false });
+  }
+};
+
+// Get all URLs for the logged-in user
+exports.getAllUrlsController = async (req, res) => {
+  try {
+    // Find all URLs belonging to this user
+    const urls = await URL.find({ user: req.userId }).sort({ createdAt: -1 });
+
+    res.json({ message : "Fetched URLs Successfull", success: true, URLObject:urls });
+  } catch (err) {
+    console.error("Error in getAllUrls:", err);
+    res.status(500).json({
+      success: false,
+      message: err.message || "Internal Server Error"
+    });
   }
 };
